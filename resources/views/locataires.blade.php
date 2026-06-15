@@ -10,7 +10,7 @@
                     <p class="mb-0">Consultez le montant à payer par locataire et son statut de règlement.</p>
                 </div>
                 <div class="text-end">
-                    <span class="badge bg-secondary py-2 px-3">5 locataires</span>
+                    <span id="tenantCount" class="badge bg-secondary py-2 px-3">0 locataires actifs</span>
                 </div>
             </div>
         </div>

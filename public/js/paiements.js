@@ -30,17 +30,23 @@ function renderPaymentTable() {
     paymentTable.classList.remove('d-none');
     paymentBody.innerHTML = invoice.locataires
         .map((locataire) => {
-            const badgeClass = locataire.statut === 'Payé' ? 'badge-paid' : 'badge-due';
+            const badgeClass = locataire.active
+                ? locataire.statut === 'Payé'
+                    ? 'badge-paid'
+                    : 'badge-due'
+                : 'badge-secondary';
             return `
-                <tr>
-                    <td>${locataire.nom}</td>
+                <tr class="${locataire.active ? '' : 'text-muted'}">
+                    <td>${locataire.nom}${locataire.active ? '' : ' (inactif)'}</td>
                     <td>${locataire.kwt}</td>
                     <td><strong>${AssikpaData.formatCurrency(locataire.montant_du)}</strong></td>
                     <td>
-                        <select class="form-select payment-status" data-name="${locataire.nom}">
-                            <option value="À payer" ${locataire.statut === 'À payer' ? 'selected' : ''}>À payer</option>
-                            <option value="Payé" ${locataire.statut === 'Payé' ? 'selected' : ''}>Payé</option>
-                        </select>
+                        ${locataire.active ? `
+                            <select class="form-select payment-status" data-name="${locataire.nom}">
+                                <option value="À payer" ${locataire.statut === 'À payer' ? 'selected' : ''}>À payer</option>
+                                <option value="Payé" ${locataire.statut === 'Payé' ? 'selected' : ''}>Payé</option>
+                            </select>
+                        ` : `<span class="badge badge-secondary text-white">Inactif</span>`}
                     </td>
                 </tr>
             `;

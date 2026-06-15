@@ -1,3 +1,5 @@
+let historyEventBound = false;
+
 document.addEventListener('DOMContentLoaded', function () {
     initializeHistory();
 });
@@ -34,13 +36,16 @@ function initializeHistory() {
         .map((month) => `<option value="${month}">${month}</option>`)
         .join('');
 
-    yearSelect.addEventListener('change', renderFilteredHistory);
-    monthSelect.addEventListener('change', renderFilteredHistory);
-    clearButton.addEventListener('click', function () {
-        yearSelect.value = '';
-        monthSelect.value = '';
-        renderFilteredHistory();
-    });
+    if (!historyEventBound) {
+        yearSelect.addEventListener('change', renderFilteredHistory);
+        monthSelect.addEventListener('change', renderFilteredHistory);
+        clearButton.addEventListener('click', function () {
+            yearSelect.value = '';
+            monthSelect.value = '';
+            renderFilteredHistory();
+        });
+        historyEventBound = true;
+    }
 
     renderFilteredHistory();
 }
@@ -61,13 +66,19 @@ function renderFilteredHistory() {
     }
 
     const filteredByYear = history.filter((item) => String(item.year) === selectedYear);
-    const months = Array.from(new Set(filteredByYear.map((item) => item.month_name)));
-    monthSelect.innerHTML = '<option value="">Tous les mois</option>' + months
+    const monthNames = [
+        'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ];
+    const previousMonth = monthSelect.value;
+    monthSelect.innerHTML = '<option value="">Tous les mois</option>' + monthNames
         .map((month) => `<option value="${month}">${month}</option>`)
         .join('');
+    monthSelect.value = monthNames.includes(previousMonth) ? previousMonth : '';
 
-    const invoices = selectedMonth
-        ? filteredByYear.filter((item) => item.month_name === selectedMonth)
+    const selectedMonthValue = monthSelect.value;
+    const invoices = selectedMonthValue
+        ? filteredByYear.filter((item) => item.month_name === selectedMonthValue)
         : filteredByYear;
 
     if (invoices.length === 0) {
@@ -87,6 +98,7 @@ function renderFilteredHistory() {
                         <th>Total KWT</th>
                         <th>Total général</th>
                         <th>Détails</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,6 +112,9 @@ function renderFilteredHistory() {
                                 <td>
                                     <button class="btn btn-sm btn-outline-secondary" type="button" onclick="toggleDetails(${invoice.id})">Voir</button>
                                 </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" type="button" onclick="confirmDelete(${invoice.id})">Supprimer</button>
+                                </td>
                             </tr>
                         `)
                         .join('')}
@@ -107,6 +122,33 @@ function renderFilteredHistory() {
             </table>
         </div>
     `;
+}
+
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Supprimer cette facture ?',
+        text: 'Cette action est définitive et supprimera l’enregistrement de l’historique.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteInvoice(id);
+        }
+    });
+}
+
+function deleteInvoice(id) {
+    AssikpaData.deleteHistory(id);
+    Swal.fire({
+        icon: 'success',
+        title: 'Supprimé',
+        text: 'La facture a bien été retirée de l’historique.',
+        timer: 1400,
+        showConfirmButton: false,
+    });
+    initializeHistory();
 }
 
 function toggleDetails(id) {

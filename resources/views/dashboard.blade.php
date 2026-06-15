@@ -47,8 +47,8 @@
         <div class="col-lg-3 col-md-6">
             <div class="card stat-card border-0 shadow">
                 <div class="card-body">
-                    <h6 class="text-muted">Locataires</h6>
-                    <h2 class="text-warning fw-bold">5</h2>
+                    <h6 class="text-muted">Locataires actifs</h6>
+                    <h2 id="dashboardTenantCount" class="text-warning fw-bold">0</h2>
                 </div>
             </div>
         </div>

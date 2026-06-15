@@ -17,15 +17,26 @@ function renderTenantList() {
     tenantEmpty.classList.add('d-none');
     tenantTable.classList.remove('d-none');
 
+    const activeCount = invoice.locataires.filter((locataire) => locataire.active !== false).length;
+    const tenantCount = document.getElementById('tenantCount');
+    if (tenantCount) {
+        tenantCount.textContent = `${activeCount} locataires actifs`;
+    }
+
     tenantBody.innerHTML = invoice.locataires
         .map((locataire) => {
-            const badgeClass = locataire.statut === 'Payé' ? 'badge-paid' : 'badge-due';
+            const badgeClass = locataire.active
+                ? locataire.statut === 'Payé'
+                    ? 'badge-paid'
+                    : 'badge-due'
+                : 'badge-secondary';
+            const statut = locataire.active ? locataire.statut : 'Inactif';
             return `
-                <tr>
-                    <td>${locataire.nom}</td>
+                <tr class="${locataire.active ? '' : 'text-muted'}">
+                    <td>${locataire.nom}${locataire.active ? '' : ' (inactif)'}</td>
                     <td>${locataire.kwt}</td>
                     <td><strong>${AssikpaData.formatCurrency(locataire.montant_du)}</strong></td>
-                    <td><span class="badge badge-status ${badgeClass} text-white">${locataire.statut}</span></td>
+                    <td><span class="badge badge-status ${badgeClass} text-white">${statut}</span></td>
                 </tr>
             `;
         })
