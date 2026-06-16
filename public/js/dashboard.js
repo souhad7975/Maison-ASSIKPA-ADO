@@ -12,25 +12,12 @@ function updateDashboard() {
     let labels = ['Locataire 1', 'Locataire 2', 'Locataire 3', 'Locataire 4', 'Locataire 5'];
     let data = [0, 0, 0, 0, 0];
 
-    const activeCount = AssikpaData.getActiveTenantCount();
-    const tenantCountEl = document.getElementById('dashboardTenantCount');
-    if (tenantCountEl) {
-        tenantCountEl.textContent = activeCount;
-    }
-
     if (invoice && invoice.locataires) {
         totalFactureEl.textContent = AssikpaData.formatCurrency(invoice.montant_total);
         totalKwtEl.textContent = invoice.kwt_total;
         totalPaiementsEl.textContent = AssikpaData.formatCurrency(invoice.total_general);
-        const activeLocataires = invoice.locataires.filter((locataire) => locataire.active !== false);
-        labels = activeLocataires.map((locataire) => locataire.nom);
-        data = activeLocataires.map((locataire) => locataire.kwt);
-    } else {
-        totalFactureEl.textContent = AssikpaData.formatCurrency(0);
-        totalKwtEl.textContent = 0;
-        totalPaiementsEl.textContent = AssikpaData.formatCurrency(0);
-        labels = AssikpaData.getActiveTenantSettings().map((locataire) => locataire.nom);
-        data = AssikpaData.getActiveTenantSettings().map(() => 0);
+        labels = invoice.locataires.map((locataire) => locataire.nom);
+        data = invoice.locataires.map((locataire) => locataire.kwt);
     }
 
     new Chart(ctx, {
